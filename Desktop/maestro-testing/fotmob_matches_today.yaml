@@ -1,0 +1,56 @@
+appId: com.mobilefootie.wc2010
+name: FotMob - Matches tab shows Today
+tags:
+  - fotmob
+  - android
+  - smoke
+---
+# 1. Launch with notification permission pre-granted (avoids the Android 13+ prompt)
+- launchApp:
+    permissions:
+      notifications: allow
+
+# 2. First-run onboarding / consent / "rate us" dialogs.
+#    Loops only while one is on screen; does nothing on a warm install.
+- repeat:
+    times: 5
+    while:
+      visible:
+        text: "(?i)(skip|not now|no thanks|maybe later|got it|accept all|accept|continue)"
+    commands:
+      - tapOn:
+          text: "(?i)(skip|not now|no thanks|maybe later|got it|accept all|accept|continue)"
+      - waitForAnimationToEnd:
+          timeout: 2000
+
+# 3. Wait for the bottom navigation instead of sleeping
+- extendedWaitUntil:
+    visible:
+      text: "Matches"
+    timeout: 15000
+
+# 4. Open the Matches tab
+#    FRAGILE: text selector. Replace with the bottom-nav resource id from Maestro Studio
+#    e.g.  id: "com.mobilefootie.wc2010:id/<matches_nav_id>"
+- tapOn:
+    text: "Matches"
+
+# 5. Select "Today" in the date strip (usually the default, tapping makes it explicit)
+- extendedWaitUntil:
+    visible:
+      text: "(?i)today"
+    timeout: 10000
+- tapOn:
+    text: "(?i)today"
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# 6. Assert we are on Matches > Today
+- assertVisible:
+    text: "(?i)today"
+# Stricter check, enable if Studio shows the tab reports selected=true:
+# - assertVisible:
+#     text: "(?i)today"
+#     selected: true
+
+- takeScreenshot: fotmob_matches_today
